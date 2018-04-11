@@ -25,12 +25,12 @@ public class Grid extends Group {
 			size = 26;
 		}
 
-		createLayout(size, style);
+		createLayout(size);
 
-		create(size, style);
+		create(size);
 	}
 
-	private void createLayout(int size, Rectangle style) {
+	private void createLayout(int size) {
 
 		// i is Letters
 
@@ -99,7 +99,7 @@ public class Grid extends Group {
 		}
 	}
 
-	private void create(int size, Rectangle style) {
+	private void create(int size) {
 
 		// i is Letters
 		// j is Numbers
@@ -116,6 +116,8 @@ public class Grid extends Group {
 				r.setStroke(style.getStroke());
 				r.setTranslateX((i + 1) * style.getWidth());
 				r.setTranslateY((j + 1) * style.getHeight());
+
+				r.setId("None");
 
 				getChildren().add(r);
 			}
@@ -156,6 +158,9 @@ public class Grid extends Group {
 				case 2:
 					removeObject(r);
 					break;
+				case 3:
+					attack(r);
+					break;
 				}
 			} else {
 				Color c = (Color) r.getFill();
@@ -183,6 +188,7 @@ public class Grid extends Group {
 				case 2:
 					removeObject(r);
 					break;
+
 				}
 			} else {
 				Color c = (Color) r.getFill();
@@ -252,10 +258,26 @@ public class Grid extends Group {
 
 	private void addObject(Rectangle r) {
 		r.setFill(Color.DARKVIOLET);
+		r.setId("Ship");
 	}
 
 	private void removeObject(Rectangle r) {
 		r.setFill(style.getFill());
+		r.setStroke(style.getStroke());
+		r.setStrokeWidth(style.getStrokeWidth());
+		r.setId("None");
+	}
+
+	private void attack(Rectangle r) {
+		if (r.getId().equals("Ship")) {
+			r.setId("Hit");
+			r.setStrokeWidth(5);
+			r.setStroke(Color.DARKGOLDENROD);
+		} else if (r.getId().equals("None")) {
+			r.setId("Miss");
+			r.setStrokeWidth(5);
+			r.setStroke(Color.STEELBLUE);
+		}
 	}
 
 	public int getMouseId() {
