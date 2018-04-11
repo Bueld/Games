@@ -1,6 +1,5 @@
 package com.bueld.snek.classes;
 
-
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -35,8 +34,16 @@ public class Grid extends Group {
 
 				r.setTranslateX((i + 1) * style.getWidth());
 				r.setTranslateY(a * style.getHeight());
+				
+				setRListeners(r,1);
 
-				getChildren().add(r);
+				Text t = new Text(Character.toString((char)((i) + 'A')));
+
+				t.setTranslateX(
+						(i + 1) * style.getWidth() + (style.getWidth() / 2) - t.getLayoutBounds().getWidth() / 2);
+				t.setTranslateY(a * style.getHeight() + (style.getHeight() / 2) + t.getLayoutBounds().getHeight() / 4);
+
+				getChildren().addAll(r,t);
 			}
 		}
 
@@ -53,12 +60,15 @@ public class Grid extends Group {
 				r.setTranslateY((j + 1) * style.getHeight());
 				r.setTranslateX(a * style.getWidth());
 				
-				Text t = new Text(new String((j+1)+""));
-				
-				t.setTranslateY((j + 1) * style.getHeight()+(style.getHeight()/2)+t.getLayoutBounds().getHeight()/4);
-				t.setTranslateX(a * style.getWidth()+(style.getWidth()/2)-t.getLayoutBounds().getWidth()/2);
+				setRListeners(r,2);
 
-				getChildren().addAll(r,t);
+				Text t = new Text(new String((j + 1) + ""));
+
+				t.setTranslateY(
+						(j + 1) * style.getHeight() + (style.getHeight() / 2) + t.getLayoutBounds().getHeight() / 4);
+				t.setTranslateX(a * style.getWidth() + (style.getWidth() / 2) - t.getLayoutBounds().getWidth() / 2);
+
+				getChildren().addAll(r, t);
 			}
 
 		}
@@ -75,7 +85,7 @@ public class Grid extends Group {
 
 				r.setStrokeType(style.getStrokeType());
 
-				setRListeners(r);
+				setRListeners(r,0);
 
 				r.setFill(style.getFill());
 				r.setStroke(style.getStroke());
@@ -88,13 +98,13 @@ public class Grid extends Group {
 
 	}
 
-	public void setRListeners(Rectangle r) {
+	public void setRListeners(Rectangle r, int id) {
 		r.setOnMouseEntered(e -> {
 			Color c = (Color) r.getStroke();
 			r.setStroke(c.darker());
 			r.setStrokeWidth(r.getStrokeWidth() + 1);
 
-			highlightHov(r);
+			highlightHov(r,id);
 		});
 
 		r.setOnMouseExited(e -> {
@@ -102,31 +112,31 @@ public class Grid extends Group {
 			r.setStroke(c.brighter());
 			r.setStrokeWidth(r.getStrokeWidth() - 1);
 
-			reHighlightHov(r);
+			reHighlightHov(r,id);
 		});
 
 		r.setOnMousePressed(e -> {
 			Color c = (Color) r.getFill();
 			r.setFill(c.darker());
 
-			highlightPress(r);
+			highlightPress(r,id);
 		});
 
 		r.setOnMouseReleased(e -> {
 			Color c = (Color) r.getFill();
 			r.setFill(c.brighter());
 
-			reHighlightPress(r);
+			reHighlightPress(r,id);
 		});
 	}
 
-	public void highlightPress(Rectangle r) {
+	public void highlightPress(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX()) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX()&&( id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.darker());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.darker());
 				}
@@ -134,13 +144,13 @@ public class Grid extends Group {
 		}
 	}
 
-	public void reHighlightPress(Rectangle r) {
+	public void reHighlightPress(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX()) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() &&( id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.brighter());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.brighter());
 				}
@@ -148,13 +158,13 @@ public class Grid extends Group {
 		}
 	}
 
-	public void highlightHov(Rectangle r) {
+	public void highlightHov(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX()) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() &&( id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.darker().darker());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.darker().darker());
 				}
@@ -162,13 +172,13 @@ public class Grid extends Group {
 		}
 	}
 
-	public void reHighlightHov(Rectangle r) {
+	public void reHighlightHov(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX()) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() &&( id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.brighter().brighter());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.brighter().brighter());
 				}

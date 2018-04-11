@@ -17,8 +17,8 @@ import javafx.stage.Stage;
 
 public class Game extends Application {
 
-	private static final Rectangle style = new Rectangle(0, 0, 40, 40);
-	private static final int gridSize = 16;
+	private static final Rectangle style = new Rectangle(0, 0, 50, 50);
+	private static final int gridSize = 10;
 	private static final String name = "Snek Killer";
 
 	private StackPane gridsPane;
