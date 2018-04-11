@@ -1,6 +1,7 @@
 package com.bueld.snek.classes;
 
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class Grid extends Group {
@@ -17,11 +18,13 @@ public class Grid extends Group {
 
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
-				Rectangle r = style;
+				Rectangle r = new Rectangle(0, 0, style.getWidth(), style.getHeight());
+				r.setFill(Color.AQUA);
+				r.setStroke(Color.BLUEVIOLET);
 				r.setTranslateX(i * style.getWidth());
 				r.setTranslateY(j * style.getHeight());
 
-				this.getChildren().add(r);
+				getChildren().add(r);
 			}
 		}
 
@@ -30,4 +33,5 @@ public class Grid extends Group {
 	public void addObjects() {
 
 	}
+
 }
