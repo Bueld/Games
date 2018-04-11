@@ -8,7 +8,18 @@ import javafx.scene.text.Text;
 
 public class Grid extends Group {
 
+	private int mouseId = 0;
+	private Rectangle style;
+
+	private double minX;
+	private double maxX;
+	private double minY;
+	private double maxY;
+
 	public Grid(int size, int playerID, Rectangle style) {
+
+		this.style = new Rectangle();
+		this.style = style;
 
 		if (size > 26 || size <= 0) {
 			size = 26;
@@ -19,7 +30,7 @@ public class Grid extends Group {
 		create(size, style);
 	}
 
-	public void createLayout(int size, Rectangle style) {
+	private void createLayout(int size, Rectangle style) {
 
 		// i is Letters
 
@@ -34,16 +45,23 @@ public class Grid extends Group {
 
 				r.setTranslateX((i + 1) * style.getWidth());
 				r.setTranslateY(a * style.getHeight());
-				
-				setRListeners(r,1);
 
-				Text t = new Text(Character.toString((char)((i) + 'A')));
+				setRListeners(r, 1);
+
+				Text t = new Text(Character.toString((char) ((i) + 'A')));
 
 				t.setTranslateX(
 						(i + 1) * style.getWidth() + (style.getWidth() / 2) - t.getLayoutBounds().getWidth() / 2);
 				t.setTranslateY(a * style.getHeight() + (style.getHeight() / 2) + t.getLayoutBounds().getHeight() / 4);
 
-				getChildren().addAll(r,t);
+				if (i == 0 && a == 0) {
+					minY = r.getTranslateY();
+				}
+				if (i == 0 && a == (size + 1)) {
+					maxY = r.getTranslateY();
+				}
+
+				getChildren().addAll(r, t);
 			}
 		}
 
@@ -59,8 +77,8 @@ public class Grid extends Group {
 
 				r.setTranslateY((j + 1) * style.getHeight());
 				r.setTranslateX(a * style.getWidth());
-				
-				setRListeners(r,2);
+
+				setRListeners(r, 2);
 
 				Text t = new Text(new String((j + 1) + ""));
 
@@ -68,13 +86,20 @@ public class Grid extends Group {
 						(j + 1) * style.getHeight() + (style.getHeight() / 2) + t.getLayoutBounds().getHeight() / 4);
 				t.setTranslateX(a * style.getWidth() + (style.getWidth() / 2) - t.getLayoutBounds().getWidth() / 2);
 
+				if (j == 0 && a == 0) {
+					minX = r.getTranslateX();
+				}
+				if (j == 0 && a == (size + 1)) {
+					maxX = r.getTranslateX();
+				}
+
 				getChildren().addAll(r, t);
 			}
 
 		}
 	}
 
-	public void create(int size, Rectangle style) {
+	private void create(int size, Rectangle style) {
 
 		// i is Letters
 		// j is Numbers
@@ -85,7 +110,7 @@ public class Grid extends Group {
 
 				r.setStrokeType(style.getStrokeType());
 
-				setRListeners(r,0);
+				setRListeners(r, 0);
 
 				r.setFill(style.getFill());
 				r.setStroke(style.getStroke());
@@ -98,13 +123,13 @@ public class Grid extends Group {
 
 	}
 
-	public void setRListeners(Rectangle r, int id) {
+	private void setRListeners(Rectangle r, int id) {
 		r.setOnMouseEntered(e -> {
 			Color c = (Color) r.getStroke();
 			r.setStroke(c.darker());
 			r.setStrokeWidth(r.getStrokeWidth() + 1);
 
-			highlightHov(r,id);
+			highlightHov(r, id);
 		});
 
 		r.setOnMouseExited(e -> {
@@ -112,31 +137,70 @@ public class Grid extends Group {
 			r.setStroke(c.brighter());
 			r.setStrokeWidth(r.getStrokeWidth() - 1);
 
-			reHighlightHov(r,id);
+			reHighlightHov(r, id);
 		});
 
 		r.setOnMousePressed(e -> {
-			Color c = (Color) r.getFill();
-			r.setFill(c.darker());
+			if (id == 0) {
+				switch (mouseId) {
 
-			highlightPress(r,id);
+				case 0:
+					Color c = (Color) r.getFill();
+					r.setFill(c.darker());
+
+					highlightPress(r, id);
+					break;
+				case 1:
+					addObject(r);
+					break;
+				case 2:
+					removeObject(r);
+					break;
+				}
+			} else {
+				Color c = (Color) r.getFill();
+				r.setFill(c.darker());
+
+				highlightPress(r, id);
+			}
+
 		});
 
 		r.setOnMouseReleased(e -> {
-			Color c = (Color) r.getFill();
-			r.setFill(c.brighter());
 
-			reHighlightPress(r,id);
+			if (id == 0) {
+				switch (mouseId) {
+
+				case 0:
+					Color c = (Color) r.getFill();
+					r.setFill(c.brighter());
+
+					reHighlightPress(r, id);
+					break;
+				case 1:
+					addObject(r);
+					break;
+				case 2:
+					removeObject(r);
+					break;
+				}
+			} else {
+				Color c = (Color) r.getFill();
+				r.setFill(c.brighter());
+
+				reHighlightPress(r, id);
+			}
 		});
+
 	}
 
-	public void highlightPress(Rectangle r, int id) {
+	private void highlightPress(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX()&&( id == 0 || id == 1)) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() && (id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.darker());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY() && (id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.darker());
 				}
@@ -144,13 +208,13 @@ public class Grid extends Group {
 		}
 	}
 
-	public void reHighlightPress(Rectangle r, int id) {
+	private void reHighlightPress(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() &&( id == 0 || id == 1)) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() && (id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.brighter());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY() && (id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getFill();
 					((Rectangle) buff).setFill(c.brighter());
 				}
@@ -158,13 +222,13 @@ public class Grid extends Group {
 		}
 	}
 
-	public void highlightHov(Rectangle r, int id) {
+	private void highlightHov(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() &&( id == 0 || id == 1)) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() && (id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.darker().darker());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY() && (id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.darker().darker());
 				}
@@ -172,13 +236,13 @@ public class Grid extends Group {
 		}
 	}
 
-	public void reHighlightHov(Rectangle r, int id) {
+	private void reHighlightHov(Rectangle r, int id) {
 		for (Node buff : this.getChildren()) {
 			if (buff instanceof Rectangle) {
-				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() &&( id == 0 || id == 1)) {
+				if (((Rectangle) buff).getTranslateX() == r.getTranslateX() && (id == 0 || id == 1)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.brighter().brighter());
-				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY()&&( id == 0 || id == 2)) {
+				} else if (((Rectangle) buff).getTranslateY() == r.getTranslateY() && (id == 0 || id == 2)) {
 					Color c = (Color) ((Rectangle) buff).getStroke();
 					((Rectangle) buff).setStroke(c.brighter().brighter());
 				}
@@ -186,8 +250,31 @@ public class Grid extends Group {
 		}
 	}
 
-	public void addObjects() {
+	private void addObject(Rectangle r) {
+		r.setFill(Color.DARKVIOLET);
+	}
 
+	private void removeObject(Rectangle r) {
+		r.setFill(style.getFill());
+	}
+
+	public int getMouseId() {
+		return mouseId;
+	}
+
+	public void setMouseId(int mouseId) {
+		this.mouseId = mouseId;
+	}
+
+	public void clearAll() {
+		for (Node buff : this.getChildren()) {
+			if (buff instanceof Rectangle) {
+				if (((Rectangle) buff).getTranslateX() != minX && ((Rectangle) buff).getTranslateX() != maxX
+						&& ((Rectangle) buff).getTranslateY() != maxY && ((Rectangle) buff).getTranslateY() != minY) {
+					removeObject((Rectangle) buff);
+				}
+			}
+		}
 	}
 
 }
