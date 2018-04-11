@@ -18,9 +18,9 @@ import javafx.stage.Stage;
 public class Game extends Application {
 
 	private static final Rectangle style = new Rectangle(0, 0, 40, 40);
-	private static final int gridSize = 19;
+	private static final int gridSize = 16;
 	private static final String name = "Snek Killer";
-	
+
 	private StackPane gridsPane;
 
 	private BorderPane borderPane;
@@ -31,16 +31,16 @@ public class Game extends Application {
 	}
 
 	private void setupGrids() {
-		
+
 		style.setFill(Color.DARKGREY);
 		style.setStroke(Color.GREY);
 		style.setStrokeType(StrokeType.INSIDE);
-		
+
 		gridsPane = new StackPane();
 		gridsPane.setBackground(null);
 		gridsPane.setPadding(new Insets(12));
-		
-		Grid g = new Grid(gridSize,0,style);
+
+		Grid g = new Grid(gridSize, 0, style);
 		gridsPane.getChildren().addAll(g);
 	}
 
