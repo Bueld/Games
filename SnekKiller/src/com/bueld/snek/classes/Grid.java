@@ -1,5 +1,6 @@
 package com.bueld.snek.classes;
 
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -48,6 +49,8 @@ public class Grid extends Group {
 
 				setRListeners(r, 1);
 
+				r.setId("Edge");
+
 				Text t = new Text(Character.toString((char) ((i) + 'A')));
 
 				t.setTranslateX(
@@ -79,6 +82,8 @@ public class Grid extends Group {
 				r.setTranslateX(a * style.getWidth());
 
 				setRListeners(r, 2);
+
+				r.setId("Edge");
 
 				Text t = new Text(new String((j + 1) + ""));
 
@@ -294,6 +299,42 @@ public class Grid extends Group {
 				if (((Rectangle) buff).getTranslateX() != minX && ((Rectangle) buff).getTranslateX() != maxX
 						&& ((Rectangle) buff).getTranslateY() != maxY && ((Rectangle) buff).getTranslateY() != minY) {
 					removeObject((Rectangle) buff);
+				}
+			}
+		}
+	}
+
+	public void takeoverIDs(String str, Bounds b) {
+
+		for (Node buff : this.getChildren()) {
+			if (buff instanceof Rectangle) {
+				if (!buff.getId().equals("Edge") && buff.getBoundsInParent().equals(b)) {
+					buff.setId(str);
+				}
+			}
+		}
+	}
+
+	public void changeToID() {
+		for (Node buff : this.getChildren()) {
+			if (buff instanceof Rectangle) {
+				switch (buff.getId()) {
+				/*
+				 * case "Ship": ((Rectangle) buff).setFill(Color.DARKVIOLET); break;
+				 */
+				case "Hit":
+					((Rectangle) buff).setStrokeWidth(5);
+					((Rectangle) buff).setStroke(Color.DARKGOLDENROD);
+					break;
+				case "Miss":
+					((Rectangle) buff).setStrokeWidth(5);
+					((Rectangle) buff).setStroke(Color.STEELBLUE);
+					break;
+				case "None":
+					((Rectangle) buff).setStroke(style.getStroke());
+					((Rectangle) buff).setFill(style.getFill());
+					((Rectangle) buff).setStrokeWidth(style.getStrokeWidth());
+					break;
 				}
 			}
 		}

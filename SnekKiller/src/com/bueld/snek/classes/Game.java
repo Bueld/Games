@@ -1,14 +1,13 @@
 package com.bueld.snek.classes;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -39,6 +38,8 @@ public class Game extends Application {
 	private Button attack;
 
 	private Button clearAll;
+
+	private Button sync;
 
 	private GridPane mouseChangers;
 
@@ -112,6 +113,11 @@ public class Game extends Application {
 			g4.setMouseId(3);
 		});
 
+		sync = new Button("Sync GridID");
+		sync.setOnAction(e -> {
+			syncGridID();
+		});
+
 		mouseChangers = new GridPane();
 
 		mouseChangers.setPadding(new Insets(20));
@@ -123,7 +129,20 @@ public class Game extends Application {
 		mouseChangers.add(delMouse, 0, 2);
 		mouseChangers.add(clearAll, 0, 3);
 		mouseChangers.add(attack, 0, 4);
+		mouseChangers.add(sync, 0, 5);
 
+	}
+
+	public void syncGridID() {
+		for (Node buff : g1.getChildren()) {
+			if (buff instanceof Rectangle) {
+				if (!buff.getId().equals("Edge")) {
+					g4.takeoverIDs(buff.getId(), buff.getBoundsInParent());
+				}
+			}
+		}
+		
+		g4.changeToID();
 	}
 
 	@Override
@@ -140,13 +159,10 @@ public class Game extends Application {
 		stage.setTitle(name);
 		stage.getIcons().add(new Image(getClass().getResourceAsStream("../img/icon.png")));
 
-		scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+		scene.setOnKeyPressed(e -> {
 
-			@Override
-			public void handle(KeyEvent e) {
-				if (e.getCode() == KeyCode.F11) {
-					stage.setFullScreen(!stage.isFullScreen());
-				}
+			if (e.getCode() == KeyCode.F11) {
+				stage.setFullScreen(!stage.isFullScreen());
 
 			}
 
