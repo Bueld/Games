@@ -143,6 +143,16 @@ public class Game extends Application {
 		}
 		
 		g4.changeToID();
+		
+		for (Node buff : g2.getChildren()) {
+			if (buff instanceof Rectangle) {
+				if (!buff.getId().equals("Edge")) {
+					g3.takeoverIDs(buff.getId(), buff.getBoundsInParent());
+				}
+			}
+		}
+		
+		g3.changeToID();
 	}
 
 	@Override
