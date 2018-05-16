@@ -11,7 +11,7 @@ public class Ball extends Ellipse {
 		this.setRadiusY(radius);
 		this.setStroke(Color.ALICEBLUE.darker());
 		this.setStrokeWidth(1);
-		this.setTranslateX(300-radius/2);
-		this.setTranslateY(250-radius/2);
+		this.setTranslateX(300 - radius / 2);
+		this.setTranslateY(250 - radius / 2);
 	}
 }

@@ -27,7 +27,7 @@ public class App extends Application {
 
 	private Paddle p1;
 	private Paddle p2;
-	
+
 	private Ball b;
 
 	private ArrayList<String> keyPressing;
@@ -35,7 +35,7 @@ public class App extends Application {
 	private Timeline time;
 
 	private double speeeeeed = 3 * Math.PI;
-	
+
 	private double ballSpeed = Math.PI;
 	private boolean ballMoving = false;
 	private double bxd;
@@ -75,9 +75,8 @@ public class App extends Application {
 		p1 = new Paddle(true);
 		p2 = new Paddle(false);
 		b = new Ball(6);
-		
 
-		playground.getChildren().addAll(p1, p2,b);
+		playground.getChildren().addAll(p1, p2, b);
 	}
 
 	private void createKeyHandling() {
@@ -89,7 +88,7 @@ public class App extends Application {
 		time.getKeyFrames().add(new KeyFrame(Duration.millis(14), e -> {
 
 			moveAccordingToKeyAction();
-			
+
 			moveBall();
 
 		}));
@@ -125,13 +124,49 @@ public class App extends Application {
 				p2.setTranslateY(p2.getTranslateY() + speeeeeed);
 			}
 		}
-		
+
 	}
-	
+
 	private void moveBall() {
-		if(ballMoving) {
-			
+		if (ballMoving) {
+			b.setTranslateX(b.getTranslateX() + bxd);
+			b.setTranslateY(b.getTranslateY() + byd);
+
+			if (b.getTranslateY() - byd - b.getRadiusY() < top.getTranslateY() + top.getHeight()) {
+				b.setTranslateY(top.getTranslateY() + top.getHeight() + b.getRadiusY());
+				byd = Math.abs(byd);
+			}
+
+			if (b.getTranslateY() + byd + b.getRadiusY() > bot.getTranslateY()) {
+				b.setTranslateY(bot.getTranslateY() - b.getRadiusY());
+				byd = -Math.abs(byd);
+			}
+
+			if (b.getTranslateX() - bxd - b.getRadiusX() < p1.getTranslateX() + p1.getWidth()
+					&& b.getTranslateY() + byd - b.getRadiusY() > p1.getTranslateY()
+					&& b.getTranslateY() + byd + b.getRadiusY() < p1.getTranslateY() + p1.getHeight()) {
+				bxd = Math.abs(bxd);
+			}
+
+			if (b.getTranslateX() + bxd + b.getRadiusX() > p2.getTranslateX()
+					&& b.getTranslateY() + byd + b.getRadiusY() > p2.getTranslateY()
+					&& b.getTranslateY() + byd + b.getRadiusY() < p2.getTranslateY() + p2.getHeight()) {
+				bxd = -Math.abs(bxd);
+			}
 		}
+	}
+
+	private void startBall() {
+
+		b.setTranslateX(300 - b.getRadiusX() / 2);
+		b.setTranslateY(250 - b.getRadiusY() / 2);
+
+		double start = Math.random() * 360;
+
+		bxd = Math.cos(start) * ballSpeed;
+		byd = Math.sin(start) * ballSpeed;
+
+		ballMoving = true;
 	}
 
 	private void addKeyPressing(String code) {
@@ -156,8 +191,10 @@ public class App extends Application {
 		scn.setOnKeyPressed(e -> {
 			if (e.getCode() == KeyCode.F11) {
 				stg.setFullScreen(!stg.isFullScreen());
-			} else if(e.getCode() == KeyCode.SPACE) {
+			} else if (e.getCode() == KeyCode.SPACE) {
 				ballMoving = !ballMoving;
+			} else if (e.getCode() == KeyCode.ENTER) {
+				startBall();
 			} else {
 				addKeyPressing(e.getCode() + "");
 			}
