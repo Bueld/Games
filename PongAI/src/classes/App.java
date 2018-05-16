@@ -14,9 +14,11 @@ public class App extends Application {
 
 	private BorderPane brdrpn;
 	private Scene scn;
-		
 	
-
+	public void init() {
+		
+	}
+		
 	@Override
 	public void start(Stage stg) {
 		brdrpn = new BorderPane();
