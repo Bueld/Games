@@ -1,5 +1,7 @@
 package classes;
 
-public class Ball {
+import javafx.scene.shape.Ellipse;
+
+public class Ball extends Ellipse {
 
 }
