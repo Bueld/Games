@@ -27,12 +27,19 @@ public class App extends Application {
 
 	private Paddle p1;
 	private Paddle p2;
+	
+	private Ball b;
 
 	private ArrayList<String> keyPressing;
 
 	private Timeline time;
 
 	private double speeeeeed = 3 * Math.PI;
+	
+	private double ballSpeed = Math.PI;
+	private boolean ballMoving = false;
+	private double bxd;
+	private double byd;
 
 	public void init() {
 
@@ -67,8 +74,10 @@ public class App extends Application {
 
 		p1 = new Paddle(true);
 		p2 = new Paddle(false);
+		b = new Ball(6);
+		
 
-		playground.getChildren().addAll(p1, p2);
+		playground.getChildren().addAll(p1, p2,b);
 	}
 
 	private void createKeyHandling() {
@@ -80,6 +89,8 @@ public class App extends Application {
 		time.getKeyFrames().add(new KeyFrame(Duration.millis(14), e -> {
 
 			moveAccordingToKeyAction();
+			
+			moveBall();
 
 		}));
 	}
@@ -114,6 +125,13 @@ public class App extends Application {
 				p2.setTranslateY(p2.getTranslateY() + speeeeeed);
 			}
 		}
+		
+	}
+	
+	private void moveBall() {
+		if(ballMoving) {
+			
+		}
 	}
 
 	private void addKeyPressing(String code) {
@@ -138,6 +156,8 @@ public class App extends Application {
 		scn.setOnKeyPressed(e -> {
 			if (e.getCode() == KeyCode.F11) {
 				stg.setFullScreen(!stg.isFullScreen());
+			} else if(e.getCode() == KeyCode.SPACE) {
+				ballMoving = !ballMoving;
 			} else {
 				addKeyPressing(e.getCode() + "");
 			}

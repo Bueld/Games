@@ -9,6 +9,8 @@ public class Paddle extends Rectangle {
 		this.setWidth(12);
 		this.setHeight(100);
 		this.setFill(Color.ALICEBLUE);
+		this.setStroke(Color.ALICEBLUE.darker());
+		this.setStrokeWidth(1.5);
 
 		if (directionRight) {
 			this.setTranslateX(0);
