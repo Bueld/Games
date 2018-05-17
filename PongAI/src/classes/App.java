@@ -5,13 +5,19 @@ import java.util.ArrayList;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -22,24 +28,37 @@ public class App extends Application {
 	private Group playground;
 
 	private Rectangle bounds;
-	private Rectangle top;
-	private Rectangle bot;
+	private Rectangle top, bot;
+	private Rectangle statsBg;
+
+	private Rectangle frame;
 
 	private Paddle p1;
 	private Paddle p2;
 
-	private Ball b;
+	private ArrayList<Ball> ballsOfSteel;
 
 	private ArrayList<String> keyPressing;
 
+	private GridPane stats;
+	private Label scoreA, scoreB;
+
+	private Button switchNameEditor;
+
 	private Timeline time;
 
+	private int ballNumber = 10000;
 	private double speeeeeed = 3 * Math.PI;
+	private double zoom = 2;
+	private int winsA, winsB;
+	private final int borderWidth = 12;
+	private final int padding = 8;
+	private final int paddleHeight = 200;
 
 	private double ballSpeed = Math.PI;
-	private boolean ballMoving = false;
-	private double bxd;
-	private double byd;
+
+	private boolean nameEditor = false;
+	private boolean paused = false;
 
 	public void init() {
 
@@ -52,31 +71,71 @@ public class App extends Application {
 
 		playground = new Group();
 
+		Color border = Color.rgb(150, 40, 190);
+
 		bounds = new Rectangle();
 		bounds.setWidth(600);
 		bounds.setHeight(500);
 		bounds.setFill(Color.rgb(10, 3, 15));
 
-		Color border = Color.rgb(150, 40, 190);
-
 		top = new Rectangle();
-		top.setWidth(600);
-		top.setHeight(10);
+		top.setWidth(bounds.getWidth());
+		top.setHeight(borderWidth);
 		top.setFill(border);
+		top.setStroke(border);
 
 		bot = new Rectangle();
-		bot.setWidth(600);
-		bot.setHeight(10);
+		bot.setWidth(bounds.getWidth());
+		bot.setHeight(borderWidth);
 		bot.setFill(border);
-		bot.setTranslateY(490);
+		bot.setTranslateY(bounds.getHeight() - bot.getHeight());
+		bot.setStroke(border);
 
-		playground.getChildren().addAll(bounds, top, bot);
+		statsBg = new Rectangle();
+		statsBg.setWidth(bounds.getWidth());
+		statsBg.setHeight(64);
+		statsBg.setFill(Color.LIGHTBLUE.brighter());
+		statsBg.setStroke(Color.LIGHTBLUE.darker());
+		statsBg.setStrokeWidth(padding);
+		statsBg.setStrokeType(StrokeType.OUTSIDE);
+		statsBg.setTranslateY(bounds.getHeight() + 16);
 
-		p1 = new Paddle(true);
-		p2 = new Paddle(false);
-		b = new Ball(6);
+		stats = new GridPane();
+		stats.setTranslateY(statsBg.getTranslateY());
+		stats.setMinHeight(statsBg.getHeight());
+		stats.setMaxHeight(statsBg.getHeight());
+		stats.setMinWidth(statsBg.getWidth());
+		stats.setMaxWidth(statsBg.getWidth());
 
-		playground.getChildren().addAll(p1, p2, b);
+		playground.getChildren().addAll(bounds, top, bot, statsBg);
+
+		p1 = new Paddle(true, bounds, paddleHeight);
+		p2 = new Paddle(false, bounds, paddleHeight);
+
+		ballsOfSteel = new ArrayList<Ball>();
+		for (int i = 0; i < ballNumber; i++) {
+			Color c = Color.hsb(Math.random() * 360, 1, 1);
+			ballsOfSteel.add(new Ball(1, ballSpeed));
+			ballsOfSteel.get(i).reset(false, bounds);
+			ballsOfSteel.get(i).setFill(c);
+			ballsOfSteel.get(i).setStroke(c.darker());
+		}
+
+		playground.getChildren().addAll(ballsOfSteel);
+
+		frame = new Rectangle();
+		frame.setHeight(bounds.getHeight() - 2);
+		frame.setWidth(bounds.getWidth() - 2);
+		frame.setTranslateX(1);
+		frame.setTranslateY(1);
+		frame.setFill(Color.TRANSPARENT);
+		frame.setStroke(border);
+		frame.setStrokeWidth(padding + 1);
+		frame.setStrokeType(StrokeType.OUTSIDE);
+
+		playground.getChildren().add(frame);
+
+		playground.getChildren().addAll(p1, p2);
 	}
 
 	private void createKeyHandling() {
@@ -89,7 +148,19 @@ public class App extends Application {
 
 			moveAccordingToKeyAction();
 
-			moveBall();
+			if (!paused) {
+				for (int i = 0; i < ballsOfSteel.size(); i++) {
+					int a = ballsOfSteel.get(i).moveBall(top, bot, p1, p2, bounds);
+					if (a == 1) {
+						winsA++;
+						ballsOfSteel.get(i).reset(false, bounds);
+					}
+					if (a == -1) {
+						winsB++;
+						ballsOfSteel.get(i).reset(false, bounds);
+					}
+				}
+			}
 
 		}));
 	}
@@ -127,53 +198,24 @@ public class App extends Application {
 
 	}
 
-	private void moveBall() {
-		if (ballMoving) {
-			b.setTranslateX(b.getTranslateX() + bxd);
-			b.setTranslateY(b.getTranslateY() + byd);
-
-			if (b.getTranslateY() - byd - b.getRadiusY() < top.getTranslateY() + top.getHeight()) {
-				b.setTranslateY(top.getTranslateY() + top.getHeight() + b.getRadiusY());
-				byd = Math.abs(byd);
-			}
-
-			if (b.getTranslateY() + byd + b.getRadiusY() > bot.getTranslateY()) {
-				b.setTranslateY(bot.getTranslateY() - b.getRadiusY());
-				byd = -Math.abs(byd);
-			}
-
-			if (b.getTranslateX() - bxd - b.getRadiusX() < p1.getTranslateX() + p1.getWidth()
-					&& b.getTranslateY() + byd - b.getRadiusY() > p1.getTranslateY()
-					&& b.getTranslateY() + byd + b.getRadiusY() < p1.getTranslateY() + p1.getHeight()) {
-				bxd = Math.abs(bxd);
-			}
-
-			if (b.getTranslateX() + bxd + b.getRadiusX() > p2.getTranslateX()
-					&& b.getTranslateY() + byd + b.getRadiusY() > p2.getTranslateY()
-					&& b.getTranslateY() + byd + b.getRadiusY() < p2.getTranslateY() + p2.getHeight()) {
-				bxd = -Math.abs(bxd);
-			}
-		}
-	}
-
-	private void startBall() {
-
-		b.setTranslateX(300 - b.getRadiusX() / 2);
-		b.setTranslateY(250 - b.getRadiusY() / 2);
-
-		double start = Math.random() * 360;
-
-		bxd = Math.cos(start) * ballSpeed;
-		byd = Math.sin(start) * ballSpeed;
-
-		ballMoving = true;
-	}
-
 	private void addKeyPressing(String code) {
 
 		if (!keyPressing.contains(code)) {
 			keyPressing.add(code);
 		}
+	}
+
+	private void adjustZoom(double height, double width) {
+		double scnRelation = height / width;
+		double boundsRelation = (bounds.getHeight() + 16 + statsBg.getHeight()) / bounds.getWidth();
+
+		if (scnRelation >= boundsRelation) {
+			zoom = width / (bounds.getWidth() + padding * 2);
+		} else {
+			zoom = height / (bounds.getHeight() + padding * 2 + 16 + statsBg.getHeight());
+		}
+		playground.setScaleX(zoom);
+		playground.setScaleY(zoom);
 	}
 
 	@Override
@@ -182,7 +224,7 @@ public class App extends Application {
 		stck.setBackground(null);
 		stck.getChildren().add(playground);
 		scn = new Scene(stck, 666, 666, true);
-		scn.setFill(Color.rgb(40, 6, 60));
+		scn.setFill(Color.rgb(5, 5, 50));
 
 		stg.setScene(scn);
 		stg.setTitle("Pong");
@@ -192,9 +234,16 @@ public class App extends Application {
 			if (e.getCode() == KeyCode.F11) {
 				stg.setFullScreen(!stg.isFullScreen());
 			} else if (e.getCode() == KeyCode.SPACE) {
-				ballMoving = !ballMoving;
+				paused = !paused;
 			} else if (e.getCode() == KeyCode.ENTER) {
-				startBall();
+				for (int i = 0; i < ballsOfSteel.size(); i++) {
+					ballsOfSteel.get(i).setMoving(true);
+				}
+			} else if (e.getCode() == KeyCode.BACK_SPACE) {
+				for (int i = 0; i < ballsOfSteel.size(); i++) {
+					ballsOfSteel.get(i).reset(false, bounds);
+					;
+				}
 			} else {
 				addKeyPressing(e.getCode() + "");
 			}
@@ -206,7 +255,24 @@ public class App extends Application {
 			}
 		});
 
+		scn.heightProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				adjustZoom(newValue.doubleValue(), scn.getWidth());
+			}
+		});
+
+		scn.widthProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				adjustZoom(scn.getHeight(), newValue.doubleValue());
+			}
+		});
+
 		stg.show();
+		adjustZoom(scn.getHeight(), scn.getWidth());
 		time.play();
 	}
 
