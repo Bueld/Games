@@ -53,7 +53,7 @@ public class App extends Application {
 	private ArrayList<String> keyPressing;
 
 	private GridPane stats;
-	private Label scoreA, scoreB, nameA, nameB;
+	private Label scoreA, scoreB;
 	private String playerA = "Méla";
 	private String playerB = "Baxi";
 
@@ -80,8 +80,11 @@ public class App extends Application {
 	private final int padding = 8;
 	private final int paddleHeight = 100;
 	private final int nameLength = 20;
+	private final int numberLength = 7;
+	private final int labelLength = 37;
+	private final String dots = "............................1";
 
-	private double ballSpeed = Math.PI;
+	private double ballSpeed = Math.PI * Math.PI;
 
 	private boolean optionsMode = false;
 	private boolean paused = false;
@@ -180,11 +183,13 @@ public class App extends Application {
 
 		Font f = Font.font("Courier New", FontWeight.BLACK, 20);
 
-		scoreA = new Label("" + winsA);
+		scoreA = new Label(playerA + ":" + dots.substring(0, labelLength - (numberLength + playerA.length() + 1))
+				+ String.format("%0" + numberLength + "d", winsA));
 		scoreA.setFont(f);
 		scoreA.setTextFill(Color.MEDIUMSLATEBLUE.darker());
 
-		scoreB = new Label("" + winsB);
+		scoreB = new Label(playerB + ":" + dots.substring(0, labelLength - (numberLength + playerB.length() + 1))
+				+ String.format("%0" + numberLength + "d", winsB));
 		scoreB.setFont(f);
 		scoreB.setTextFill(Color.MEDIUMSLATEBLUE.darker());
 
@@ -193,27 +198,15 @@ public class App extends Application {
 		optionsButton.setOnAction(e -> {
 			enterOptions();
 		});
-
-		nameA = new Label(playerA + ": ");
-		nameA.setFont(f);
-		nameA.setTextFill(Color.MEDIUMSLATEBLUE.darker());
-		nameB = new Label(playerB + ": ");
-		nameB.setFont(f);
-		nameB.setTextFill(Color.MEDIUMSLATEBLUE.darker());
-
-		stats.add(scoreA, 1, 0);
-		stats.add(scoreB, 1, 1);
-		stats.add(nameA, 0, 0);
-		stats.add(nameB, 0, 1);
+		stats.add(scoreA, 0, 0);
+		stats.add(scoreB, 0, 1);
 		stats.add(optionsButton, 1, 0);
 
-		GridPane.setConstraints(scoreA, 1, 0, 1, 1, HPos.LEFT, VPos.CENTER);
-		GridPane.setConstraints(scoreB, 1, 1, 1, 1, HPos.LEFT, VPos.CENTER);
-		GridPane.setConstraints(optionsButton, 2, 0, 1, 2, HPos.CENTER, VPos.CENTER);
-		GridPane.setHgrow(scoreA, Priority.NEVER);
-		GridPane.setHgrow(scoreB, Priority.NEVER);
-		GridPane.setHgrow(nameA, Priority.ALWAYS);
-		GridPane.setHgrow(nameB, Priority.ALWAYS);
+		GridPane.setConstraints(scoreA, 0, 0, 1, 1, HPos.LEFT, VPos.CENTER);
+		GridPane.setConstraints(scoreB, 0, 1, 1, 1, HPos.LEFT, VPos.CENTER);
+		GridPane.setConstraints(optionsButton, 1, 0, 1, 2, HPos.RIGHT, VPos.CENTER);
+		GridPane.setHgrow(scoreA, Priority.ALWAYS);
+		GridPane.setHgrow(scoreB, Priority.ALWAYS);
 		GridPane.setHgrow(optionsButton, Priority.NEVER);
 	}
 
@@ -338,7 +331,8 @@ public class App extends Application {
 		setPlayerA = createButton("y", Color.rgb(0, 130, 0), Color.rgb(0, 180, 0));
 		setPlayerA.setOnAction(e -> {
 			playerA = editPlayerA.getText();
-			nameA.setText(playerA + ": ");
+			scoreA.setText(playerA + ":" + dots.substring(0, labelLength - (numberLength + playerA.length() + 1))
+					+ String.format("%0" + numberLength + "d", winsA));
 		});
 
 		optionsGrid.add(setPlayerA, 2, 1);
@@ -346,7 +340,8 @@ public class App extends Application {
 		setPlayerB = createButton("y", Color.rgb(0, 130, 0), Color.rgb(0, 180, 0));
 		setPlayerB.setOnAction(e -> {
 			playerB = editPlayerB.getText();
-			nameB.setText(playerB + ": ");
+			scoreB.setText(playerB + ":" + dots.substring(0, labelLength - (numberLength + playerB.length() + 1))
+					+ String.format("%0" + numberLength + "d", winsB));
 		});
 
 		optionsGrid.add(setPlayerB, 2, 2);
@@ -431,12 +426,16 @@ public class App extends Application {
 					int a = ballsOfSteel.get(i).moveBall(top, bot, p1, p2, bounds);
 					if (a == 1) {
 						winsA++;
-						scoreA.setText("" + winsA);
+						scoreA.setText(
+								playerA + ":" + dots.substring(0, labelLength - (numberLength + playerA.length() + 1))
+										+ String.format("%0" + numberLength + "d", winsA));
 						ballsOfSteel.get(i).reset(false, bounds);
 					}
 					if (a == -1) {
 						winsB++;
-						scoreB.setText("" + winsB);
+						scoreB.setText(
+								playerB + ":" + dots.substring(0, labelLength - (numberLength + playerB.length() + 1))
+										+ String.format("%0" + numberLength + "d", winsB));
 						ballsOfSteel.get(i).reset(false, bounds);
 					}
 				}
