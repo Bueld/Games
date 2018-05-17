@@ -57,11 +57,11 @@ public class Ball extends Ellipse {
 	private int checkGoal(Rectangle bounds) {
 		if (this.getTranslateX() < 0) {
 			reset(false, bounds);
-			return 1;
+			return -1;
 		}
 		if (this.getTranslateX() > bounds.getWidth()) {
 			reset(false, bounds);
-			return -1;
+			return 1;
 		}
 		return 0;
 	}
