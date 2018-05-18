@@ -72,7 +72,7 @@ public class App extends Application {
 
 	private Timeline time;
 
-	private int ballNumber = 10;
+	private int ballNumber = 5000;
 	private double speeeeeed = 3 * Math.PI;
 	private double zoom = 2;
 	private int winsA, winsB;
@@ -84,7 +84,7 @@ public class App extends Application {
 	private final int labelLength = 37;
 	private final String dots = "............................1";
 
-	private double ballSpeed = Math.PI * Math.PI;
+	private double ballSpeed = 2;
 
 	private boolean optionsMode = false;
 	private boolean paused = false;
@@ -126,7 +126,7 @@ public class App extends Application {
 		ballsOfSteel = new ArrayList<Ball>();
 		for (int i = 0; i < ballNumber; i++) {
 			Color c = Color.hsb(Math.random() * 360, 1, 1);
-			ballsOfSteel.add(new Ball(8, ballSpeed));
+			ballsOfSteel.add(new Ball(2, ballSpeed));
 			ballsOfSteel.get(i).reset(false, bounds);
 			ballsOfSteel.get(i).setFill(c);
 			ballsOfSteel.get(i).setStroke(c.darker());

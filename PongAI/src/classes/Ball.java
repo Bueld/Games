@@ -10,6 +10,8 @@ public class Ball extends Ellipse {
 	private boolean moving = false;
 	private double ballSpeed, restartCooldown;
 
+	private final double maxDegChange = 30;
+
 	public Ball(double radius, double speed) {
 		this.setRadiusX(radius);
 		this.setRadiusY(radius);
@@ -36,11 +38,13 @@ public class Ball extends Ellipse {
 					&& this.getTranslateY() + byd - this.getRadiusY() > p1.getTranslateY()
 					&& this.getTranslateY() + byd + this.getRadiusY() < p1.getTranslateY() + p1.getHeight()) {
 				bxd = Math.abs(bxd);
+				reflecFromPaddle(0, p1);
 			}
 			if (this.getTranslateX() + bxd + this.getRadiusX() > p2.getTranslateX()
 					&& this.getTranslateY() + byd + this.getRadiusY() > p2.getTranslateY()
 					&& this.getTranslateY() + byd + this.getRadiusY() < p2.getTranslateY() + p2.getHeight()) {
 				bxd = -Math.abs(bxd);
+				reflecFromPaddle(1, p2);
 			}
 			this.setTranslateX(this.getTranslateX() + bxd);
 			this.setTranslateY(this.getTranslateY() + byd);
@@ -52,6 +56,33 @@ public class Ball extends Ellipse {
 			moving = true;
 		}
 		return checkGoal(bounds);
+	}
+
+	private void reflecFromPaddle(int id, Rectangle p) {
+
+		double midOffset = (this.getTranslateY() - p.getTranslateY() - p.getHeight() / 2) / p.getHeight() * 2;
+
+		byd += ballSpeed * midOffset * 2;
+		byd /= ballSpeed;
+
+		double now = Math.sqrt(byd * byd + bxd * bxd);
+		bxd *= ballSpeed / now;
+		byd *= ballSpeed / now;
+
+		double deg = Math.toDegrees(Math.asin(byd / ballSpeed));
+
+		if (deg < 90 && deg > 85) {
+			deg = 85;
+		} else if (deg >= 90 && deg < 95) {
+			deg = 95;
+		} else if (deg > -95 && deg < -90) {
+			deg = -95;
+		} else if (deg < -85 && deg >= -90) {
+			deg = -85;
+		}
+
+		bxd = Math.cos(Math.toRadians(deg)) * ballSpeed * Math.pow(-1, id);
+		byd = Math.sin(Math.toRadians(deg)) * ballSpeed;
 	}
 
 	private int checkGoal(Rectangle bounds) {
@@ -73,8 +104,12 @@ public class Ball extends Ellipse {
 
 		double start = Math.random() * 360;
 
-		bxd = Math.cos(start) * ballSpeed;
-		byd = Math.sin(start) * ballSpeed;
+		while ((start > 60 && start < 120) || (start > 240 && start < 300)) {
+			start = Math.random() * 360;
+		}
+
+		bxd = Math.cos(Math.toRadians(start)) * ballSpeed;
+		byd = Math.sin(Math.toRadians(start)) * ballSpeed;
 
 		moving = move;
 		restartCooldown = 100;
